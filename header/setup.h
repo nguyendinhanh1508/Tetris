@@ -19,6 +19,7 @@ enum KeyPressed {A, W, S, D};
 KeyPressed CurKey;
 double SleepTime = 50; //fps = 1000/50 fyi
 bool MovingPiece = false;
+int counter = 0;
 
 //player data
 std::string PlayerName;

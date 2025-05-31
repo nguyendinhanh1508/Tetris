@@ -16,4 +16,6 @@ void GameInit() {
     }
     //hide the cursor
     std::cout << "\x1b[?25l";
+    //set the counter to 0
+    counter = 0;
 }
