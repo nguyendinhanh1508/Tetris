@@ -3,9 +3,9 @@
 #include <iostream>
 #include <conio.h>
 #include <windows.h>
-#include "render.h";
-#include "../header/setup.h";
-#include "../header/pieces.h";
+#include "render.h"
+#include "../header/setup.h"
+#include "../header/pieces.h"
 #include <unordered_set>
 
 void SetDifficulty();
@@ -16,6 +16,7 @@ bool CanRotate();
 bool CanMove(int change_x, int change_y);
 void CreateNew();
 void Imprint();
+bool GameOverCheck();
 void UpdateGame();
 void Game();
 

@@ -1,59 +1,61 @@
 #include "../header/game.h"
 
 void SetDifficulty() {
+    std::cout << "Welcome to \033[31mT\033[38;5;202mE\033[33mT\033[32mR\033[36mI\033[35mS\033[0m in the terminal\n";
     std::cout << "Please input your name: " << std::endl;
     std::getline(std::cin, PlayerName);
     std::cout << "Please choose a difficulty from 1 to 15 (set to 1 by default): " << std::endl;
     std::string inpt;
     std::getline(std::cin, inpt);
     if (inpt == "1") {
-        SleepTime = 1000;
+        SleepTime = 20;
     }
     else if (inpt == "2") {
-        SleepTime = 900;
+        SleepTime = 18;
     }
     else if (inpt == "3") {
-        SleepTime = 800;
+        SleepTime = 16;
     }
     else if (inpt == "4") {
-        SleepTime = 700;
+        SleepTime = 14;
     }
     else if (inpt == "5") {
-        SleepTime = 600;
+        SleepTime = 12;
     }
     else if (inpt == "6") {
-        SleepTime = 500;
+        SleepTime = 10;
     }
     else if (inpt == "7") {
-        SleepTime = 450;
+        SleepTime = 9;
     }
     else if (inpt == "8") {
-        SleepTime = 400;
+        SleepTime = 8;
     }
     else if (inpt == "9") {
-        SleepTime = 350;
+        SleepTime = 7;
     }
     else if (inpt == "10") {
-        SleepTime = 300;
+        SleepTime = 6;
     }
     else if (inpt == "11") {
-        SleepTime = 250;
+        SleepTime = 5;
     }
     else if (inpt == "12") {
-        SleepTime = 200;
+        SleepTime = 4;
     }
     else if (inpt == "13") {
-        SleepTime = 150;
+        SleepTime = 3;
     }
     else if (inpt == "14") {
-        SleepTime = 120;
+        SleepTime = 2;
     }
     else if (inpt == "15") {
-        SleepTime = 100;
+        SleepTime = 1;
     }
     else {
-        SleepTime = 400;
+        SleepTime = 20;
     }
+    system("cls");
 }
 
 void PlayerInput() {
@@ -68,7 +70,7 @@ void PlayerInput() {
             case 's':
                 CurKey = S;
                 break;
-            case 'D':
+            case 'd':
                 CurKey = D;
                 break;
         }
@@ -78,11 +80,16 @@ void PlayerInput() {
 bool HittingGround() {
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            int nx = x + i;
-            int ny = y + j;
-            if(nx >= 0 && nx <= height && ny >= 0 && ny <= width) {
-                if (CurPiece[i][j] == 'x' && grid[nx + 1][ny] == 'x') {
-                    if (nx == height - 1 || grid[nx + 1][ny] == 'x') return true;
+            if (CurPiece[i][j] == 'x') {
+                int pieceBottom = x + i;
+                int pieceCol = y + j;
+                if (pieceBottom == height - 1) {
+                    return true;
+                }
+                if (pieceBottom >= 0 && pieceBottom + 1 < height - 1 && pieceCol >= 0 && pieceCol < width) {
+                    if (grid[pieceBottom + 1][pieceCol] == 'x') {
+                        return true;
+                    }
                 }
             }
         }
@@ -93,12 +100,19 @@ bool HittingGround() {
 bool DetectCollision(char NewPiece[4][4], int nx, int ny) {
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            int nx = x + i;
-            int ny = y + j;
-            if(nx >= 0 && nx <= height && ny >= 0 && ny <= width) {
-                if (CurPiece[i][j] == 'x' && grid[nx][ny] == 'x') return true;
+            if (NewPiece[i][j] == 'x') {
+                int cx = nx + i;
+                int cy = ny + j;
+                if (cy < 0 || cy >= width) {
+                    return true;
+                }
+                if (cx >= height) {
+                    return true;
+                }
+                if (cx >= 0 && grid[cx][cy] == 'x') {
+                    return true;
+                }
             }
-            else if (CurPiece[i][j] == 'x') return true;
         }
     }
     return false;
@@ -112,13 +126,13 @@ bool CanRotate() {
         }
     }
     rotate(NewPiece);
-    return DetectCollision(NewPiece, x, y);
+    return !DetectCollision(NewPiece, x, y);
 }
 
 bool CanMove(int change_x, int change_y) {
     int nx = x + change_x;
     int ny = y + change_y;
-    return DetectCollision(CurPiece, nx, ny);
+    return !DetectCollision(CurPiece, nx, ny);
 }
 
 #include <random>
@@ -145,6 +159,8 @@ Color random_color() {
             return MAGENTA;
         case 5:
             return CYAN;
+        default:
+            return BLUE;
     }
 }
 
@@ -165,7 +181,7 @@ void Imprint() {
         for (int j = 0; j < 4; j++) {
             int nx = x + i;
             int ny = y + j;
-            if (CurPiece[i][j] == 'x' && nx >= 0 && nx < height && ny >= 0 && ny <= width) {
+            if (CurPiece[i][j] == 'x' && nx >= 0 && nx < height && ny >= 0 && ny < width) {
                 grid[nx][ny] = 'x';
             }
         }
@@ -200,57 +216,104 @@ void DeleteFullRows() {
             grid[i][j] = newgrid[i][j];
         }
     }
+    PlayerScore += full.size() * 1000;
+}
+
+bool GameOverCheck() {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (CurPiece[i][j] == 'x') {
+                int gridX = 0 + i;
+                int gridY = 3 + j;
+                if (gridX >= 0 && gridX < height && gridY >= 0 && gridY < width) {
+                    if (grid[gridX][gridY] == 'x') {
+                        return true;
+                    }
+                }
+                else if (gridX < 0 || gridY < 0 || gridY >= width) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 void UpdateGame() {
     if (HittingGround()) counter++;
     else counter = 0;
-    if (counter == 3) {
+    if (counter >= 30) {
         counter = 0;
         MovingPiece = false;
+        PlayerScore += 100;
     }
     if (MovingPiece) {
         switch(CurKey) {
-            case A:
+            case W:
                 if (CanRotate()) {
                     rotate(CurPiece);
                 }
+                if (HittingGround()) counter++;
                 break;
-            case W:
+            case A:
                 if (CanMove(0, -1)) {
                     y--;
                 }
+                if (HittingGround()) counter++;
                 break;
             case S:
-                if (CanMove(1, 0)) {
+                while (CanMove(1, 0)) {
                     x++;
                 }
+                counter = 0;
+                MovingPiece = false;
+                PlayerScore += 100;
+                Imprint();
+                DeleteFullRows();
+                CreateNew();
+                if (GameOverCheck()) {
+                    GameOver = true;
+                    return;
+                }
+                MovingPiece = true;
+                if (HittingGround()) counter++;
                 break;
             case D:
                 if (CanMove(0, 1)) {
                     y++;
                 }
+                if (HittingGround()) counter++;
+                break;
+            default:
+                if (HittingGround()) counter++;
                 break;
         }
-        if (CanMove(1, 0)) {
+        CurKey = NONE;
+        if (GameTime % SleepTime == 0 && CanMove(1, 0)) {
             x++;
         }
     }
     else {
         Imprint();
+        DeleteFullRows();
         CreateNew();
+        if (GameOverCheck()) {
+            GameOver = true;
+            return;
+        }
         MovingPiece = true;
     }
-    DeleteFullRows();
 }
 
 void Game() {
+    GameTime++;
     Render();
     PlayerInput();
     UpdateGame();
-    Sleep(SleepTime);
     if (GameOver) {
-        GameInit();
+        HighScore = std::max(HighScore, PlayerScore);
+        Render();
+        Sleep(1000);
         std::cout << std::endl;
         std::cout << "Game Over, Play Again?(y/n): ";
         char answer;
@@ -261,13 +324,16 @@ void Game() {
         else {
             system("cls");
             std::cout << "Thank you for playing my game!\n";
-            std::cout << "Tetris in Terminal\n";
-            std::cout << "© 2025 Nguyen Dinh Anh\n";
-            std::cout << "Exit the game?(y/n)\n";
+            Sleep(1000);
+            std::cout << "And this is \033[31mT\033[38;5;202mE\033[33mT\033[32mR\033[36mI\033[35mS\033[0m in the terminal\n";
+            Sleep(1000);
+            std::cout << "Made by Nguyen Dinh Anh\n";
+            Sleep(1000);
+            std::cout << "Exit the game?";
             std::cin >> answer;
-            if (answer == 'y') {
-                exit(1);
-            }
         }
+    }
+    else {
+        Sleep(50);
     }
 }

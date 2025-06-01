@@ -1,30 +1,30 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef SETUP_H
+#define SETUP_H
 #include <iostream>
 #include <string>
 
 //piece Data
 enum Color { RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN };
-char CurPiece[4][4];
-int x, y;
-Color CurColor;
+extern char CurPiece[4][4];
+extern int x, y;
+extern Color CurColor;
 
 //game data
 const int width = 10;
 const int height = 24;
-char grid[height][width];
-int GameOver = false;
-int PlayerScore = 0;
-enum KeyPressed {A, W, S, D};
-KeyPressed CurKey;
-double SleepTime = 50; //fps = 1000/50 fyi
-bool MovingPiece = false;
-int counter = 0;
+extern char grid[height][width];
+extern bool GameOver;
+enum KeyPressed {A, W, S, D, NONE};
+extern KeyPressed CurKey;
+extern int SleepTime;
+extern bool MovingPiece;
+extern int counter;
+extern int GameTime;
 
 //player data
-std::string PlayerName;
-int PlayerScore = 0;
-int HighScore = 0;
+extern std::string PlayerName;
+extern int PlayerScore;
+extern int HighScore;
 
 //init the game
 void GameInit();
